@@ -46,16 +46,25 @@ function! OSCYankVisual() range
   let [line_start, column_start] = getpos("'<")[1:2]
   let [line_end, column_end] = getpos("'>")[1:2]
 
-  let lines = getline(line_start, line_end)
+  " If the visual selection's positions don't match the arguments passed in,
+  " the _actual_ selection is most likely a single line or the full file (via
+  " "%").
+  let line_mismatch = line_start != a:firstline || line_end != a:lastline
+
+  let lines = line_mismatch ? \
+    getline(a:firstline, a:lastline) : \
+    getline(line_start, line_end)
+
   if len(lines) == 0
     return ''
   endif
 
-  let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
-  let lines[0] = lines[0][column_start - 1:]
+  if !line_mismatch
+    let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
+    let lines[0] = lines[0][column_start - 1:]
+  endif
 
   call OSCYankString(join(lines, "\n"))
-  execute "normal! `<"
 endfunction
 
 " Send the input text object to the terminal's clipboard using OSC52.
