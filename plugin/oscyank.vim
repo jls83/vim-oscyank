@@ -51,9 +51,7 @@ function! OSCYankVisual() range
   " "%").
   let line_mismatch = line_start != a:firstline || line_end != a:lastline
 
-  let lines = line_mismatch ? \
-    getline(a:firstline, a:lastline) : \
-    getline(line_start, line_end)
+  let lines = line_mismatch ? getline(a:firstline, a:lastline) : getline(line_start, line_end)
 
   if len(lines) == 0
     return ''
